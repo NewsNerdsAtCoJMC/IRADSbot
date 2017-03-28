@@ -14,6 +14,7 @@ HELP = "help"
 TOTAL_ENROLLMENT = "total enrollment"
 UNDERGRADUATE_ENROLLMENT = "undergraduate enrollment"
 GRADUATE_ENROLLMENT = "graduate enrollment"
+POPULAR_MAJOR = "most popular major"
 
 #----SLACK CLIENT----#
 #This is needed to interact with Slack.
@@ -75,6 +76,14 @@ def get_graduate_enrollment(command):
     for item in response:
         formatted_response += "%s  %s\n" % (item[0], item[1])
     return formatted_response
+    
+def get_most_popular_major(command):
+    query = "SELECT MajorName, Total FROM majors ORDER BY Total DESC LIMIT 20"
+    response = sql_query(query)
+    formatted_response = "*Major*  *Total*\n"
+    for item in response:
+        formatted_response += "%s\t  %s\n" % (item[0], item[1])
+    return formatted_response
 
 #----COMMAND HANDLING----#
 #This function parses the message and figures out how to respond.
@@ -91,13 +100,15 @@ def handle_command(command, channel):
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...write some more code then I can do that!"
     elif command.startswith(GREETING) or command.startswith(HELP):
-        response = "Howdy. I can tell you interesting things about UNL. Here's what I can do:\ntotal enrollment since [year]\nundergraduate enrollment since [year]\ngraduate enrollment since [year]\nchange [startyear] [endyear]\npercent change [startyear] [endyear]\nAnd I'm adding more all the time so check back."
+        response = "Howdy. I can tell you interesting things about UNL. Here's what I can do:\nI have enrollment data since 1967 so I can tell you ... \ntotal enrollment since [year]\nundergraduate enrollment since [year]\ngraduate enrollment since [year]\nchange [startyear] [endyear]\npercent change [startyear] [endyear]\nmost popular major\nAnd I'm adding more all the time so check back."
     elif command.startswith(TOTAL_ENROLLMENT):
         response = get_total_enrollment(command)
     elif command.startswith(UNDERGRADUATE_ENROLLMENT):
         response = get_undergraduate_enrollment(command)
     elif command.startswith(GRADUATE_ENROLLMENT):
         response = get_graduate_enrollment(command)
+    elif command.startswith(POPULAR_MAJOR):
+        response = get_most_popular_major(command)
     else:
         response = "Not sure what you mean. Try something else."
 
